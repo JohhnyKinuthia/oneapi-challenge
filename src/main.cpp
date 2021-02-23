@@ -7,13 +7,15 @@
 // located in $ONEAPI_ROOT/compiler/latest/linux/include/sycl/
 #include <iostream>
 #include <cmath>
-#include <vector>
+#include <array>
+#include <random>
 #include "Coordinate.h"
 # define PI           3.14159265358979323846 /* pi */
 # define EARTH_RADIUS_M 6371.8e3
 
 using namespace cl::sycl;
 
+constexpr int N = 200; //sample number of vehicles on the road
 //forward declaration
 float haversineDistance(Coordinate& p1, Coordinate& p2);
 float degToRad(float degrees); //convert degrees to radians
@@ -26,23 +28,26 @@ int main() {
 
   //Get data from connected mobile devices(to be added later)
   //Sample data for now
-  std::vector<Coordinate> coordinates;
-  Coordinate p1{0, 0}, p2{0, 0};
-  Coordinate p3{51.5, 0}, p4{38.8, -77.1};
-  std::cout << haversineDistance(p1, p2) << endl;
-  std::cout << haversineDistance(p3, p4)/1000<< endl;
-  std::cout << PI << '\n';
+  std::array<Coordinate, N> host_coordinates;
+  default_random_engine generator;
+  //random coordinate generator within Nairobi
+  uniform_real_distribution<float> lat_distribution(-1.3107271220657644, -1.2736576954765284);
+  uniform_real_distribution<float> long_distribution(36.65426546691808, 36.99964813694435);
+  for(int i = 0; i<N; ++i) {
+  	host_coordinates = Coordinate{lat_distribution(generator), long_distribution(generator)};
+  }
   // create a buffer
-  constexpr int num = 16;
-  auto R = range<1>{ num };
-  buffer<int> A{ R };
+  auto R = range<1>{ N };
+  buffer<Coordinate> A{ R };
 
   // create a kernel
   class ExampleKernel;
   queue q{device_selector };
   q.submit([&](handler& h) {
     auto out = A.get_access<access::mode::write>(h);
-    h.parallel_for<ExampleKernel>(R, [=](id<1> idx) { out[idx] = idx[0]; });
+    h.parallel_for<ExampleKernel>(R, [=](id<1> idx) { 
+		    out[idx] = idx[0]; 
+    });
   });
 
   // consume result
@@ -56,6 +61,7 @@ int main() {
 
 float haversineDistance(Coordinate& p1, Coordinate& p2)
 //Returns the approximate distance between two points using haversine algorithm
+//Is this allowed inside a SYCL call?
 {
         float lat_diff = degToRad(p2.latitude() - p1.latitude());
         float long_diff = degToRad(p2.longitude() - p1.longitude());

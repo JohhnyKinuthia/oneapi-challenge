@@ -1,4 +1,5 @@
 //A simple coordinate point
+#include <ostream>
 struct Coordinate
 {
         public:
@@ -10,8 +11,15 @@ struct Coordinate
                 double longitude() const {
                         return longit;
                 }
+
         private:
                 double lat;
                 double longit;
 };
+
+std::ostream& operator<<(std::ostream& os, const Coordinate& obj)
+{
+   // write obj to stream
+   return os << obj.latitude() << ", " << obj.longitude();
+}
 

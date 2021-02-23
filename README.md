@@ -1,4 +1,8 @@
-# `Make based GPU Project` Template
+# Solve traffic congestion using DPC++
+This project aims to solve traffic congestion in towns using DPC++. We are living in the age of IoT(Internet Of Things) where every device will be connected to the internet. Imagine that every car is connected to the internet and we can get real-time data of its current position, where its headed and its speed. This can allow us to build a traffic control solution that is proactive as it understands the anticipated current state of the road. It can give priority to congested lanes which have a higher tendency of being congested at peek hours. To process the huge load of data so that we can make decisions at near real-time, we can use heterogenous computing platforms such as Intel DevMesh and DPC++.
+
+
+# `Make based GPU Project`
 A minimal project template for GPU using make build system.
 
 | Optimized for                     | Description
